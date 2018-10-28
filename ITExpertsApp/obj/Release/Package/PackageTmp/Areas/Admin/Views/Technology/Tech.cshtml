@@ -1,0 +1,239 @@
+﻿
+@{
+    ViewBag.Title = "Tech";
+}
+<div class="container">
+    <div class="row">
+        <h1>Here you can add, edit or delete technologies.</h1>
+        <br />
+    </div>
+    <div class="row">
+        <div class="text-danger">
+            NOTE: when using technology items and notes, it is recommended to type in things like package managers, testing software, frameworks, debuggers/profilers, operating systems etc. It is mandatory to be able to distinct all possible skill requirements for possible employees in the notes.
+        </div>
+        <br />
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="SelectPath">Paths:</label>
+                <select id="SelectPath" class="form-control" onchange="ShowAllTechs()"></select>
+            </div>
+            <p id="info"></p>
+            <div class="form-group">
+                <label for="SelectTech">Existing technologies:</label>
+                <select id="SelectTech" class="form-control" onchange="ShowTech()">
+                    <option value="-1">Select path to load technologies</option>
+                </select>
+            </div>
+            <p id="pErr"></p>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="txtName">Name of the technology:</label>
+                <input id="txtName" type="text" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="txtDesc">Technology items and notes:</label>
+                <textarea id="txtDesc" rows="6" cols="20" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <input id="btAdd" type="button" value="Add as new" class="btn btn-primary" onclick="AddTech()" />
+                <input id="btUpdate" type="button" value="Update existing" class="btn btn-primary" onclick="UpdateTech()" />
+                <input id="btDelete" type="button" value="Delete" class="btn btn-primary" onclick="DeleteTech()" />
+            </div>
+            <p id="pStatus"></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(function () {
+            ShowAllPaths();
+        });
+
+        function ShowAllPaths() {
+            var request = $.getJSON("/Admin/Technology/AllPaths");
+
+            request.done(function (paths) {
+                var combo = $("#SelectPath");
+                var s = "<option value=\"0\">Select path</option>";
+                $("#pErr").html("");
+
+                for (var i = 0; i < paths.length; i++) {
+                    s += "<option value=" + paths[i].PathId + ">" + paths[i].PathName + "</option>";
+                }
+                combo.html(s);
+            });
+
+            request.fail(function (error) {
+                $("#pErr").html(error.statusText);
+            });
+        }
+
+        function ShowAllTechs() {
+            var pathId = $("#SelectPath").val();
+            if (pathId > 0) {
+                var request = $.getJSON("/Admin/Technology/AllTechs/?pathId=" + pathId);
+
+                request.done(function (techs) {
+                    var combo = $("#SelectTech");
+                    var s = "<option value=\"0\">Select technology</option>";
+                    $("#pErr").html("");
+
+                    for (var i = 0; i < techs.length; i++) {
+                        s += "<option value=" + techs[i].TechId + ">" + techs[i].TechName + "</option>";
+                    }
+                    combo.html(s);
+                    $("#txtName").val("");
+                    $("#txtDesc").text("");
+                });
+
+                request.fail(function (error) {
+                    $("#pErr").html(error.statusText);
+                });
+            }
+        }
+
+        function ShowTech() {
+            var techId = $("#SelectTech").val();
+            if (techId > 0) {
+                var request = $.getJSON("/Admin/Technology/ReturnTech/?techId=" + techId);
+
+                request.done(function (tech) {
+                    $("#pStatus").html("");
+                    $("#txtName").val(tech.TechName);
+                    $("#txtDesc").text(tech.TechDescription);
+                });
+
+                request.fail(function (error) {
+                    $("#pStatus").html(error.statusText);
+                });
+            }
+            else {
+                $("#txtName").val("");
+                $("#txtDesc").text("");
+            }
+        }
+
+        function AddTech() {
+            var pathid = $("#SelectPath").val();
+            var techid = $("#SelectTech").val();
+            var name = $("#txtName").val();
+            var desc = $("#txtDesc").text();
+
+            var tech = {
+                PathId: pathid,
+                TechId: techid,
+                TechName: name,
+                TechDescription: desc
+            };
+
+            $("#pStatus").html("");
+            $("#btAdd").attr("disable", "true");
+            $("#btUpdate").attr("disable", "true");
+            $("#btDelete").attr("disable", "true");
+
+            var request = $.ajax({
+                type: "POST",
+                url: "/Admin/Technology/AddTech",
+                data: JSON.stringify(tech),
+                contentType: "application/json",
+                dataType: "Text"
+            });
+
+            request.done(function (result) {
+                if (result == 0) {
+                    $("#pStatus").html("Error in operation!");
+                }
+                else {
+                    $("#pStatus").html("The technology has been added.");
+                    ShowAllTechs();
+                    $("#txtName").val("");
+                    $("#txtDesc").text("");
+                    $("#txtName").focus();
+                }
+            });
+
+            request.fail(function (err) {
+                $("#pStatus").html(err.statusText);
+            });
+
+            $("#btAdd").attr("disable", "false");
+            $("#btUpdate").attr("disable", "false");
+            $("#btDelete").attr("disable", "false");
+        }
+
+        function UpdateTech() {
+            var pathid = $("#SelectPath").val();
+            var techid = $("#SelectTech").val();
+            var name = $("#txtName").val();
+            var desc = $("#txtDesc").text();
+
+            var tech = {
+                PathId: pathid,
+                TechId: techid,
+                TechName: name,
+                TechDescription: desc
+            };
+
+            $("#pStatus").html("");
+            $("#btAdd").attr("disable", "true");
+            $("#btUpdate").attr("disable", "true");
+            $("#btDelete").attr("disable", "true");
+
+            var request = $.ajax({
+                type: "POST",
+                url: "/Admin/Technology/UpdateTech",
+                data: JSON.stringify(tech),
+                contentType: "application/json",
+                dataType: "Text"
+            });
+
+            request.done(function (result) {
+                if (result == 0) {
+                    $("#pStatus").html("Error in operation!");
+                }
+                else {
+                    $("#pStatus").html("The technology has been updated.");
+                }
+            });
+
+            request.fail(function (err) {
+                $("#pStatus").html(err.statusText);
+            });
+
+            $("#btAdd").attr("disable", "false");
+            $("#btUpdate").attr("disable", "false");
+            $("#btDelete").attr("disable", "false");
+        }
+
+        function DeleteTech() {
+            var techId = $("#SelectTech").val();
+
+            if (techId > 0) {
+                $("#pStatus").html("");
+                $("#btAdd").attr("disable", "true");
+                $("#btUpdate").attr("disable", "true");
+                $("#btDelete").attr("disable", "true");
+
+                var request = $.getJSON("/Admin/Technology/DeleteTech/?techId=" + techId);
+
+                request.done(function (result) {
+                    if (result == 1) {
+                        $("#pStatus").html("The technology has been deleted.");
+                        $("#txtName").val("");
+                        $("#txtDesc").text("");
+                        ShowAllTechs();
+                    }
+                    else {
+                        $("#pStatus").html("Error in operation.");
+                    }
+                });
+
+                request.fail();
+            }
+        }
+    </script>
+    }

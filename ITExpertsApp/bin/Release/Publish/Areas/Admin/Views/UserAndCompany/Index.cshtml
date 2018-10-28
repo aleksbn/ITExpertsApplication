@@ -1,0 +1,85 @@
+﻿@model IEnumerable<ITExpertsApp.Models.ViewModels.Account.UserVM>
+
+@if (TempData["Status"] != null)
+{
+    <h3 class="text-warning">@TempData["Status"]</h3>
+}
+
+<h2>All members</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            Type
+        </th>
+        <th>
+            Name
+        </th>
+        <th>
+            Email
+        </th>
+        <th>
+            Blocked
+        </th>
+        <th>
+            Is completed
+        </th>
+        <th>
+            Delete?
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @if (item.RoleId == 102)
+            {
+                <span>User</span>
+            }
+            else
+            {
+                <span>Company</span>
+            }
+        </td>
+        <td>
+            @if (item.RoleId == 102)
+            {
+                <span>@item.FirstName @item.LastName</span>
+            }
+            else
+            {
+                <span>@item.FirstName</span>
+            }
+        </td>
+        <td>
+            <a href="mailto:@(item.Email)">@item.Email</a>
+        </td>
+        <td>
+            @if (item.Blocked == false)
+            {
+                <a class="text-primary" href="/Admin/UserAndCompany/ChangeStatus/?id=@item.UserId&status=false">No</a>
+            }
+            else
+            {
+                <a class="text-primary" href="/Admin/UserAndCompany/ChangeStatus/?id=@item.UserId&status=true">Yes</a>
+            }
+        </td>
+        <td>
+            @if (item.IsCompleted.HasValue)
+            {
+                if (item.IsCompleted.Value == true)
+                {
+                    <span>Yes</span>
+                }
+                else
+                {
+                    <span>No</span>
+                }
+            }
+        </td>
+        <td>
+            @Html.ActionLink("Delete", "DeleteUser", new { id = item.UserId })
+        </td>
+    </tr>
+}
+</table>

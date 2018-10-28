@@ -1,0 +1,306 @@
+﻿@model ITExpertsApp.Models.ViewModels.RegisterVM
+
+@{
+    ViewBag.Title = "Create Account";
+}
+
+<h2>Create account</h2>
+
+<div class="row">
+    <br />
+    @if (Session["Message"] != null)
+    {
+    <p id="pMessage" class="text-warning">
+        @Session["Message"]
+    </p>
+    }
+    <div class="form-group">
+        <label for="SelectType">Select the type</label>
+        <select class="form-control" id="SelectType" onload="DisplayForm()" onchange="DisplayForm()">
+            <option value="0">Choose the account type</option>
+            <option value="1">Developer</option>
+            <option value="2">Company</option>
+        </select>
+    </div>
+</div>
+
+<form id="UserForm" action="/Account/CreateUserAccount" method="post" hidden>
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <hr />
+        <div class="form-group">
+            @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserEmail, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.UserEmail, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.UserEmail, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserEmailConfirm, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.UserEmailConfirm, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.UserEmailConfirm, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserPassword, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.UserPassword, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.UserPassword, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserPasswordConfirmed, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.UserPasswordConfirmed, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.UserPasswordConfirmed, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+    </form>
+
+<form id="CompanyForm" action="/Account/CreateCompanyAccount" method="post" hidden onsubmit="return ValidateCompany()">
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <hr />
+        <div class="form-group">
+            @Html.LabelFor(model => model.CompanyName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CompanyName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CompanyName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CompanyEmail, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CompanyEmail, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CompanyEmail, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CompanyEmailConfirm, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CompanyEmailConfirm, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CompanyEmailConfirm, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CompanyPassword, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CompanyPassword, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CompanyPassword, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CompanyPasswordConfirmed, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CompanyPasswordConfirmed, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CompanyPasswordConfirmed, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create company" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Styles{
+    <style>
+        form label.error {
+            color: red;
+            margin-left: 10px;
+            width: auto;
+            font-style: italic;
+        }
+    </style>
+    }
+
+@section Scripts {
+
+        <script>
+            $("#UserForm").validate({
+                rules: {
+                    FirstName: {
+                        required: true,
+                        minlength: 2,
+                        maxlength: 50
+                    },
+                    LastName: {
+                        required: true,
+                        minlength: 2,
+                        maxlength: 50
+                    },
+                    UserEmail: {
+                        required: true,
+                        email: true,
+                        minlength: 5,
+                        maxlength: 50
+                    },
+                    UserEmailConfirm: {
+                        required: true,
+                        email: true,
+                        minlength: 5,
+                        maxlength: 50
+                    },
+                    UserPassword: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 50
+                    },
+                    UserPasswordConfirm: "required",
+                },
+                messages: {
+                    FirstName: {
+                        required: "You must enter your first name!",
+                        minlength: "First name must be from 2 to 50 letters.",
+                        maxlength: "First name must be from 2 to 50 letters.",
+                    },
+                    LastName: {
+                        required: "You must enter your last name!",
+                        minlength: "Last name must be from 2 to 50 letters.",
+                        maxlength: "Last name must be from 2 to 50 letters.",
+                    },
+                    UserEmail: {
+                        required: "You must enter your email address!",
+                        email: "You must enter valid email address!",
+                        minlength: "Email must be from 5 to 50 letters.",
+                        maxlength: "Email must be from 5 to 50 letters.",
+                    },
+                    UserEmailConfirm: {
+                        required: "You must enter your email address confirmation!",
+                        email: "You must enter valid email address!",
+                        minlength: "Email confirmation must be from 5 to 50 letters.",
+                        maxlength: "Email confirmation must be from 5 to 50 letters.",
+                    },
+                    UserPassword: {
+                        required: "You must enter your password!",
+                        minlength: "Password must be from 6 to 50 letters.",
+                        maxlength: "Password must be from 6 to 50 letters.",
+                    },
+                    UserPasswordConfirm: "You must enter your password confirmation!"
+                }
+            });
+
+            $("#CompanyForm").validate({
+                rules: {
+                    CompanyName: {
+                        required: true,
+                        minlength: 5,
+                        maxlength: 50
+                    },
+                    CompanyEmail: {
+                        required: true,
+                        email: true,
+                        minlength: 5,
+                        maxlength: 50
+                    },
+                    CompanyEmailConfirm: {
+                        required: true,
+                        email: true,
+                        minlength: 5,
+                        maxlength: 50
+                    },
+                    CompanyPassword: {
+                        required: true,
+                        minlength: 6,
+                        maxlength: 50
+                    },
+                    CompanyPasswordConfirm: "required"
+                },
+                messages: {
+                    CompanyName: {
+                        required: "You must enter your first name!",
+                        minlength: "First name must be from 5 to 50 letters.",
+                        maxlength: "First name must be from 2 to 50 letters.",
+                    },
+                    CompanyEmail: {
+                        required: "You must enter your email address!",
+                        email: "You must enter valid email address!",
+                        minlength: "Email must be from 5 to 50 letters.",
+                        maxlength: "Email must be from 5 to 50 letters.",
+                    },
+                    CompanyEmailConfirm: {
+                        required: "You must enter your email address confirmation!",
+                        email: "You must enter valid email address!",
+                        minlength: "Email confirmation must be from 5 to 50 letters.",
+                        maxlength: "Email confirmation must be from 5 to 50 letters.",
+                    },
+                    CompanyPassword: {
+                        required: "You must enter your password!",
+                        minlength: "Password must be from 6 to 50 letters.",
+                        maxlength: "Password must be from 6 to 50 letters.",
+                    },
+                    CompanyPasswordConfirm: "You must enter your password confirmation!"
+                }
+            });
+
+            $(function () {
+                if (sessionStorage.Option == 1) {
+                    $("#SelectType option:eq(1)").attr("selected", "true");
+                    $("#SelectType option:eq(2)").removeAttr("selected");
+                    $("#UserForm").removeAttr("hidden");
+                    $("#CompanyForm").attr("hidden", "true");
+                }
+                else if (sessionStorage.Option == 2) {
+                    $("#SelectType option:eq(2)").attr("selected", "true");
+                    $("#SelectType option:eq(1)").removeAttr("selected");
+                    $("#CompanyForm").removeAttr("hidden");
+                    $("#UserForm").attr("hidden", "true");
+                } else {
+                    $("#CompanyForm").attr("hidden", "true");
+                    $("#UserForm").attr("hidden", "true");
+                }
+            });
+
+            function DisplayForm() {
+                var option = $("#SelectType").val();
+
+                if (option == 1) {
+                    $("#UserForm").removeAttr("hidden");
+                    $("#CompanyForm").attr("hidden", "true");
+                    sessionStorage.Option = 1;
+                }
+                else if (option == 2) {
+                    $("#CompanyForm").removeAttr("hidden");
+                    $("#UserForm").attr("hidden", "true");
+                    sessionStorage.Option = 2;
+                } else {
+                    $("#UserForm").attr("hidden", "true");
+                    $("#CompanyForm").attr("hidden", "true");
+                    sessionStorage.Option = 0;
+                }
+            }
+        </script>
+    }

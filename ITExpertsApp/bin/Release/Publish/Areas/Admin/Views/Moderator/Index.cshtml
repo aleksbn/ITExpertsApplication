@@ -1,0 +1,66 @@
+﻿@model IEnumerable<ITExpertsApp.Models.ViewModels.ModeratorVM>
+
+@{
+    ViewBag.Title = "All moderators";
+}
+
+@if (ViewBag.Result != null)
+{
+    <br />
+    <span class="text-warning">@ViewBag.Result</span>
+}
+<br />
+<p>
+    @Html.ActionLink("Add New", "AddModerator")
+</p>
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>
+            Moderator ID
+        </th>
+        <th>
+            First Name
+        </th>
+        <th>
+            Last Name
+        </th>
+        <th>
+            Email
+        </th>
+        <th>
+            Blocked
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @item.UserId
+        </td>
+        <td>
+            @item.FirstName
+        </td>
+        <td>
+            @item.LastName
+        </td>
+        <td>
+            @item.Email
+        </td>
+        <td>
+            @if (item.Blocked == true)
+            {
+                <a class="text-primary" href="/Admin/Moderator/ChangeStatus/?id=@item.UserId&status=true">Yes</a>
+            }
+            else
+            {
+                <a class="text-primary" href="/Admin/Moderator/ChangeStatus/?id=@item.UserId&status=false">No</a>
+            }
+        </td>
+        <td>
+            @Html.ActionLink("Delete", "DeleteModerator", new { id = item.UserId })
+        </td>
+    </tr>
+}
+
+</table>

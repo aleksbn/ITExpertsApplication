@@ -1,0 +1,98 @@
+﻿@model int
+
+@{
+    ViewBag.Title = "All of your workers";
+}
+
+<h2>All Employees</h2>
+
+<table class="table table-bordered table-striped" id="tabela">
+    <tr>
+        <th>
+            First name
+        </th>
+        <th>
+            Last name
+        </th>
+        <th>
+            Email
+        </th>
+        <th>
+            Salary
+        </th>
+        <th>
+            Details
+        </th>
+        <th>
+            Fire
+        </th>
+    </tr>
+
+</table>
+
+<p id="error">
+
+</p>
+
+@section Scripts{
+    <script>
+
+        $(function () {
+            Employees();
+        });
+
+        function Employees() {
+            var request = $.getJSON("/company/employees");
+
+            request.done(function (employees) {
+                $("#tabela:not(:first)").remove();
+                $("#error").html("");
+                var s = "";
+                for (var i in employees) {
+                    s += "<tr><td>" + employees[i].FirstName + "</td>";
+                    s += "<td>" + employees[i].LastName + "</td>";
+                    s += "<td>" + employees[i].Email + "</td>";
+                    s += "<td>" + employees[i].Salary + " \u20AC" + "</td>";
+                    var link = document.createElement("a");
+                    link.href = "../user/publicprofile?id=" + employees[i].UserId;
+                    link.text = "Details";
+                    s += "<td><a href=\"" + link + "\">Details</td>";
+                    s += "<td><input type=\"button\" name=\"fire\" class=\"btn btn-primary\" value=\"Fire\" onclick=\"FireEmployee(" +
+                        employees[i].UserId + ", " + @Model + ")\"/></td></tr>";
+                }
+
+                $("#tabela").append(s);
+            });
+
+            request.fail(function (error) {
+                $("#error").html(error.statusText);
+            });
+        }
+
+        function FireEmployee(userId, companyId) {
+            var reason = "";
+            while (true) {
+                reason = prompt("Please, state the reason for firing the employee (at least 15 chars):");
+                if (reason.length > 15) {
+                    break;
+                }
+            }
+
+            var request = $.getJSON("/company/fireemployee/?userid=" + userId + "&companyid=" + companyId + "&reason=" + reason);
+
+            request.done(function (status) {
+                if (status == 1) {
+                    $("#error").html("");
+                    Employees();
+                }
+                else {
+                    $("#error").html("There has been some mistake.");
+                }
+            });
+
+            request.fail(function (status) {
+                $("#error").html(statsu);
+            });
+        }
+    </script>
+}

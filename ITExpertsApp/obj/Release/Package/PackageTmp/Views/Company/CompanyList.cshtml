@@ -1,0 +1,92 @@
+﻿@model IEnumerable<ITExpertsApp.Models.ViewModels.CompanyVM>
+
+@{
+    ViewBag.Title = "All companies";
+}
+
+@section Styles{
+    <style>
+        .link {
+            cursor: pointer;
+        }
+    </style>
+}
+
+<h2>All companies</h2>
+
+<table class="table table-striped table-bordered">
+    <tr>
+        <th>
+            Name
+        </th>
+        <th width="50%">
+            Description
+        </th>
+        <th>
+            Public profile
+        </th>
+        @if (User.IsInRole("User"))
+        {
+            <th>
+                Ask for a job
+            </th>
+        }
+    </tr>
+
+    @*Srediti da se elementi pojavljuju na svim a ne samo na prvom redu*@
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                <b>@item.CompanyName</b>
+            </td>
+            <td width="50%">
+                @if (item.Description.Length > 30)
+                {
+                    string moreid = "more" + item.CompanyId.ToString();
+                    string allid = "all" + item.CompanyId.ToString();
+                    string lessid = "less" + item.CompanyId.ToString();
+
+                    @item.Description.Substring(0, 30)<a class="link" id="@moreid" onclick="Show('@moreid', '@lessid', '@allid')"> ...More</a><span id="@allid" hidden>@item.Description.Substring(30)</span><a class="link" id="@lessid" hidden onclick="Hide('@moreid', '@lessid', '@allid')"> ...Less</a>
+                }
+                else
+                {
+                    @item.Description
+                }
+            </td>
+            <td>
+                <a href="/company/PublicCompanyProfile?id=@item.CompanyId">Profile</a>
+            </td>
+            @if (User.IsInRole("User"))
+            {
+                <td>
+                    <a href="/company/requestjob?id=@item.CompanyId">Ask</a>
+                </td>
+            }
+        </tr>
+    }
+
+</table>
+
+@section Scripts{
+    <script>
+        function Show(moreid, lessid, allid) {
+            moreid = "#" + moreid;
+            lessid = "#" + lessid;
+            allid = "#" + allid;
+            $(moreid).attr("hidden", "true");
+            $(allid).removeAttr("hidden");
+            $(lessid).removeAttr("hidden");
+        }
+
+        function Hide(moreid, lessid, allid) {
+            moreid = "#" + moreid;
+            lessid = "#" + lessid;
+            allid = "#" + allid;
+            $(allid).attr("hidden", "true");
+            $(lessid).attr("hidden", "true");
+            $(moreid).removeAttr("hidden");
+        }
+    </script>
+}

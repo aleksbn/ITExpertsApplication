@@ -1,0 +1,355 @@
+﻿@{
+    ViewBag.Title = "Search potential employees";
+}
+
+<br />
+<h2>All employees in our database</h2>
+<br />
+@if (TempData["Status"] != null)
+{
+    <div class="row">
+        <div class="col-md-8">
+            <p id="pError" class="label label-danger text-center">
+                @TempData["Status"]
+            </p>
+        </div>
+    </div>
+}
+
+<div class="row" id="SearchForm" hidden>
+    <div class="row">
+        <h4 style="font-weight: bold">Select you search criteria:</h4>
+        <h3 style="color: red; font-style: italic;">Be patient! There are many database entries, it takes up to 40 seconds to load them all.</h3>
+        <hr />
+    </div>
+    <fieldset id="fs">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="Newcomers" class="control-label col-md-7">Only newcomers</label>
+                        <div class="col-md-5">
+                            <div class="checkbox">
+                                <input name="Newcomers" class="check-box" id="Newcomers" type="checkbox" onchange="NewcomersChanged()" value="true">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="UnemployedOnly" class="control-label col-md-7">Only unemployed</label>
+                        <div class="col-md-5">
+                            <div class="checkbox">
+                                <input name="UnemployedOnly" class="check-box" id="UnemployedOnly" type="checkbox" onchange="UnemployedOnlyChanged()" value="true">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="MinSalary" class="control-label col-md-7">Minimum salary (<b>&euro;</b>)</label>
+                        <div class="col-md-5">
+                            <select name="MinSalary" id="MinSalary" class="form-control">
+                                <option value="0">0</option>
+                                @for (int i = 500; i < 5000; i += 100)
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="MaxSalary" class="control-label col-md-7">Maximum salary (<b>&euro;</b>)</label>
+                        <div class="col-md-5">
+                            <select name="MaxSalary" id="MaxSalary" class="form-control">
+                                <option value="0">0</option>
+                                @for (int i = 500; i < 5000; i += 100)
+                                {
+                                    <option value="@i">@i</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="DevPath" class="control-label col-md-4">Development path:</label>
+                        <div class="col-md-8">
+                            <select id="DevPath" name="DevPath" class="form-control" onchange="LoadTechs()">
+                                <option value="0" selected>All paths</option>
+                                <option value="101">Back-end</option>
+                                <option value="102">Front-end</option>
+                                <option value="103">Dev-ops</option>
+                            </select>
+                        </div>
+                    </div>
+                    <img src="~/Content/Images/Loading.gif" height="25" width="25" hidden id="loadingGif" />
+                    <div class="form-group">
+                        <label for="Technologies" class="control-label col-md-4">Technologies:</label>
+                        <div class="col-md-8">
+                            <select id="Technologies" name="Technologies" class="form-control" multiple size="6">
+                                <option value="0" disabled>Select one or more</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label for="YearsOfWork" class="control-label col-md-4">Years of work:</label>
+                        <div class="col-md-8">
+                            <select id="YearsOfWork" name="YearsOfWork" class="form-control">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="EducationLevel" class="control-label col-md-4">Education level:</label>
+                        <div class="col-md-8">
+                            <select id="EducationLevel" name="EducationLevel" class="form-control">
+                                <option value="0">All levels</option>
+                                <option value="2">High School</option>
+                                <option value="3">Bachelor</option>
+                                <option value="4">Engineer</option>
+                                <option value="5">Master</option>
+                                <option value="6">PHD</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <div class="row">
+        <input id="go" class="btn btn-primary form-control" type="button" value="Go!" onclick="DisplayTable()" />
+    </div>
+</div>
+<div class="row" id="helpText">
+    <p>Press on the arrow to display the search form</p>
+</div>
+<div class="row text-center">
+    <span id="showhide" class="glyphicon glyphicon-arrow-down" onclick="DisplayMenu()"></span>
+</div>
+<div class="row">
+    <div class="col-md-10" id="table">
+        <img src="~/Content/Images/Loading.gif" height="75" width="75" hidden id="loadingGifLarge" style="text-align: center" />
+    </div>
+</div>
+<p id="pError">
+
+</p>
+
+@section Scripts{
+    <style>
+        #showhide {
+            cursor: pointer;
+        }
+
+        .glyphicon {
+            font-size: 2.0em;
+        }
+
+            .glyphicon:hover {
+                color: blue;
+            }
+
+        #helpText {
+            color: blue;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .form-control {
+            border-width: 2px;
+            border-color: white;
+        }
+    </style>
+
+    <script>
+        var status = 0;
+        var newcomerstatus = 0;
+        var unemployedonlystatus = 0;
+        var query = "";
+        var minsalary = 0;
+        var maxsalary = 0;
+        var yearsofwork = 0;
+        var educationlevel = 2;
+
+        function DisplayMenu() {
+            if (status == 0) {
+                $("#SearchForm").removeAttr("hidden");
+                $("#showhide").removeClass("glyphicon-arrow-down");
+                $("#showhide").addClass("glyphicon-arrow-up");
+                $("#helpText").attr("hidden", "true");
+                status = 1;
+            }
+            else {
+                $("#SearchForm").attr("hidden", "true");
+                $("#showhide").addClass("glyphicon-arrow-down");
+                $("#showhide").removeClass("glyphicon-arrow-up");
+                $("#helpText").removeAttr("hidden");
+                status = 0;
+            }
+        }
+
+        function CollectParameters() {
+            query = "/user/returnemployees";
+            var newcomersBox = document.getElementById("Newcomers");
+            if (newcomersBox.checked == true) {
+                query += "?newcomers=true" + "&educationlevel=" + $("#EducationLevel").val();
+            } else {
+                var unemployedonlybox = document.getElementById("UnemployedOnly");
+                if (unemployedonlybox.checked == true) {
+                    query += "?unemployedonly=true&";
+                }
+                else {
+                    query += "?";
+                }
+                query += "minsalary=" + $("#MinSalary").val()
+                    + "&maxsalary=" + $("#MaxSalary").val() + "&educationlevel="
+                    + $("#EducationLevel").val() + "&yearsofwork=" + $("#YearsOfWork").val()
+                    + ReturnTechnologies();
+
+                if ($("#DevPath").val() > 0) {
+                    query += "&devpath=" + $("#DevPath").val();
+                }
+            }
+
+            return query;
+        }
+
+        function DisplayTable() {
+            var request = $.getJSON(CollectParameters());
+            $("#go").attr("disabled", "true");
+            $("#fs").attr("disabled", "true");
+            $("#pError").html("");
+
+            request.done(function (workers) {
+                var t = "<table class=\"table table-striped table-bordered\">";
+                t += "<tr><th>Number</th><th>First Name</th><th>Last Name</th><th>Email</th><th>Working Profile</th>";
+                t += "<th>Hire</th></tr>";
+                var brojac = 1;
+
+                for (var i = 0; i < workers.length; i++) {
+                    t += "<tr><td>" + brojac + "</td>";
+                    t += "<td>" + workers[i].FirstName + "</td><td>" + workers[i].LastName + "</td>";
+                    t += "<td><a href=\"mailto:" + workers[i].Email + "\">" + workers[i].Email + "</a></td>";
+                    t += "<td><input type=\"button\" class=\"btn btn-primary\" value=\"Details\" " +
+                        "onclick =\"GoToDetails(" + workers[i].UserId + ")\"\></td>";
+                    t += "<td><button type=\"button\" class=\"btn btn-primary\" onclick=\"HireEmployee("
+                        + workers[i].UserId + ")\">Hire</button></td>";
+                    brojac++;
+                }
+                $("#go").removeAttr("disabled");
+                t += "</table>";
+
+                $("#table").html(t);
+                $("#fs").removeAttr("disabled");
+                $("#go").removeAttr("disabled");
+            });
+
+            request.fail(function (error) {
+                $("#pError").html("Greska!");
+                $("#fs").removeAttr("disabled");
+                $("#go").removeAttr("disabled");
+            });
+        }
+
+        function GoToDetails(id) {
+            window.open("/user/publicprofile?id=" + id, "_blank");
+        }
+
+        function HireEmployee(id) {
+            if (confirm("Are you sure you want to send a job request to this employee?")) {
+                window.location.href = "/User/Hire?id=" + id;
+            }
+        }
+
+        function ReturnTechnologies() {
+            var s = "";
+            var niz = $("#Technologies").val() || [];
+            for (var t in niz) {
+                s += "&Technologies[" + t + "]=" + niz[t];
+            }
+            return s;
+        }
+
+        function NewcomersChanged() {
+            if (newcomerstatus == 0) {
+                $("#UnemployedOnly").attr("disabled", "true");
+                $("#MinSalary").attr("disabled", "true");
+                $("#MaxSalary").attr("disabled", "true");
+                $("#DevPath").attr("disabled", "true");
+                $("#Technologies").attr("disabled", "true");
+                $("#YearsOfWork").attr("disabled", "true");
+                $("#Newcomers").attr("style", "border-color: blue");
+                $("#EducationLevel").attr("style", "border-color: blue");
+                newcomerstatus = 1;
+            }
+            else {
+                $("#UnemployedOnly").removeAttr("disabled");
+                $("#MinSalary").removeAttr("disabled");
+                $("#MaxSalary").removeAttr("disabled");
+                $("#DevPath").removeAttr("disabled");
+                $("#Technologies").removeAttr("disabled");
+                $("#YearsOfWork").removeAttr("disabled");
+                $("#Newcomers").removeAttr("style");
+                $("#EducationLevel").removeAttr("style");
+                newcomerstatus = 0;
+            }
+        }
+
+        function UnemployedOnlyChanged() {
+            if (unemployedonlystatus == 0) {
+                $("#Newcomers").attr("disabled", "true");
+                unemployedonlystatus = 1;
+            }
+            else {
+                $("#Newcomers").removeAttr("disabled");
+                unemployedonlystatus = 0;
+            }
+        }
+
+        function LoadTechs() {
+
+            $("#loadingGif").removeAttr("hidden");
+            $("#Technologies").attr("size", "1");
+            $("#Technologies").html("<option value=\"0\">Select one or more</option>");
+            var id = $("#DevPath").val();
+
+            if (id > 0) {
+                var request = $.getJSON("/admin/technology/alltechs/?pathid=" + $("#DevPath").val());
+
+                request.done(function (techs) {
+                    var s = "";
+
+                    for (var i = 0; i < techs.length; i++) {
+                        s += "<option value=" + techs[i].TechId + ">" + techs[i].TechName + "</option>";
+                    }
+
+                    $("#Technologies").append(s);
+                    $("#loadingGif").attr("hidden", "true");
+                    $("#Technologies").attr("size", "6");
+                });
+
+                request.fail(function (error) {
+                    $("#pError").html(error.statusText);
+                });
+            }
+
+            else {
+                $("#loadingGif").attr("hidden", "true");
+                $("#Technologies").attr("size", "6");
+            }
+        }
+    </script>
+}

@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="ITExpertsContext-Web.config Connection String" description="ITExpertsContext Connection String used in web.config by the application to access the database." defaultValue="Server=tcp:itexperts.database.windows.net,1433;Initial Catalog=ITExpertsDB;Persist Security Info=False;User ID=aleksbn;Password=Partizan417302;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\aleks\\Documents\\Visual\ Studio\ 2017\\Projects\\ITExpertsApp\\ITExpertsApp\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='ITExpertsContext']/@connectionString" />
+  </parameter>
+</parameters>

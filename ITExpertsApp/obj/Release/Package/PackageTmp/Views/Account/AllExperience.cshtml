@@ -1,0 +1,298 @@
+﻿@model ITExpertsApp.Models.ViewModels.Account.WorkingAtVM
+
+@{
+    ViewBag.Title = "All of your working experience";
+}
+
+<br />
+<h2>You working experience</h2>
+<div class="row">
+    <div class="col-md-10">
+        <table class="table table-striped table-bordered" id="previousHistory" hidden>
+            <tr>
+                <th>Company name</th>
+                <th>Job description</th>
+                <th>Since</th>
+                <th>Until</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </table>
+    </div>
+    <div class="col-md-2">
+
+    </div>
+</div>
+<br />
+
+<form id="form1" action="/Account/AllExperience" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <br />
+        <div class="form-group">
+            <div class="col-md-2 control-label">
+                <label for="CompanyId">Select the company</label>
+            </div>
+            <div class="col-md-10">
+                <select id="CompanyId" name="CompanyId" class="form-control">
+                    <option value="0">Existing company</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.CompanyId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-2 control-label">
+                <label for="CompanyName">Or enter the name manually</label>
+            </div>
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CompanyName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CompanyName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-2 control-label">
+                <label for="PathId">Select the job position</label>
+            </div>
+            <div class="col-md-10">
+                <select id="PathId" name="PathId" class="form-control" onchange="ShowAllTechs()">
+                    <option value="0">Position</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.PathId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-2 control-label">
+                <label for="TechId">Select the technology you used (ctrl + click on everything you used)</label>
+            </div>
+            <div class="col-md-10">
+                <select id="TechId" name="TechId" class="form-control" multiple>
+                    <option value="0">Technology</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.TechId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Since, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Since, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Since, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Until, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Until, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Until, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="Add job" class="btn btn-default" onclick="TimeCheck()" />
+            </div>
+        </div>
+    </div>
+</form>
+    <p id="pError">
+
+    </p>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+
+        <script src="~/Scripts/DateTimeConverter.js"></script>
+
+        <script>
+            $(function () {
+
+                AllPaths();
+
+                AllCompanies();
+
+                LoadPreviousHistory();
+            });
+
+            function LoadPreviousHistory() {
+                var request = $.getJSON("/account/GetAllHistory");
+
+                request.done(function (workings) {
+
+                    if (workings[0].UserId != null) {
+
+                        $("#previousHistory").removeAttr("hidden");
+                        var table = "";
+                        var prevId = -1;
+                        var prevName = "";
+
+                        for (var i = 0; i < workings.length; i++) {
+                            if (prevId != workings[i].CompanyId || prevName != workings[i].CompanyName) {
+                                table += "<tr><td>" + workings[i].CompanyName + "</td>";
+                                if (workings[i].Description != null) {
+                                    table += "<td>" + workings[i].Description + "</td>";
+                                }
+                                else {
+                                    table += "<td>Nothing to show</td>";
+                                }
+                                var since = parseJsonDate(workings[i].Since);
+                                table += "<td>" + since  + "</td>";
+                                if (workings[i].Until != null) {
+                                    var until = parseJsonDate(workings[i].Until);
+                                    table += "<td>" + until + "</td>";
+                                }
+                                else {
+                                    table += "<td>Currently working here</td>";
+                                }
+                                table += "<td><button type=\"button\" class=\"btn btn-primary\" onclick=\"EditHistory(" + workings[i].UserId + ", " + workings[i].CompanyId + ")\">Edit</button></td>";
+                                table += "<td><button type=\"button\" class=\"btn btn-primary\" onclick=\"DeleteHistory(" + workings[i].UserId + ", " + workings[i].CompanyId + ")\">Delete</button></td>";
+                                if (workings[i].Until == null) {
+                                    table += "<td><button type=\"button\" class=\"btn btn-primary\" onclick=\"Quit(" + workings[i].CompanyId + ")\">Quit</button></td>";
+                                }
+                                else {
+                                    table += "<td></td>";
+                                }
+                                prevId = workings[i].CompanyId;
+                                prevName = workings[i].CompanyName;
+                            }
+                        }
+
+                        $("#previousHistory").append(table);
+                    }
+                });
+
+                request.fail(function (error) {
+                    $("#pError").html(error.statusText);
+                });
+            }
+
+            function DeleteHistory(UserId, CompanyId) {
+                if (confirm("Do you really want to delete this working history?") == true) {
+                    var request = $.getJSON("/account/deletehistory?userid=" + UserId + "&companyid=" + CompanyId);
+
+                    request.done(function (data) {
+                        if (data == 1) {
+                            alert("You just deleted selected history.");
+                            location.reload();
+                        }
+                        else {
+                            alert("You were unable to delete history. Something went wrong.");
+                        }
+                    });
+
+                    request.fail(function (error) {
+                        $("#pError").html(error.statusText);
+                    });
+                }
+            }
+
+            function AllPaths() {
+                var request = $.getJSON("/admin/technology/allpaths");
+
+                request.done(function (paths) {
+                    var combo = $("#PathId");
+
+                    for (var i = 0; i < paths.length; i++) {
+                        var opcija = "<option value=\"" + paths[i].PathId + "\">" + paths[i].PathName + " developer</option>";
+                        combo.append(opcija);
+                    }
+
+                    $("#pError").innerHTML = "";
+                });
+
+                request.fail(function (error) {
+                    $("#pError").innerHTML = error.statusText;
+                });
+            }
+
+            function ShowAllTechs() {
+                var pathId = $("#PathId").val();
+                if (pathId > 0) {
+                    var request = $.getJSON("/Admin/Technology/AllTechs/?pathId=" + pathId);
+
+                    request.done(function (techs) {
+                        var combo = $("#TechId");
+                        combo.html("");
+                        $("#pErr").html("");
+
+                        for (var i = 0; i < techs.length; i++) {
+                            var opcija = "<option value=\"" + techs[i].TechId + "\">" + techs[i].TechName + "</option>";
+                            combo.append(opcija);
+                        }
+
+                        combo.attr("size", techs.length);
+
+                        $("#pError").innerHTML = "";
+                    });
+
+                    request.fail(function (error) {
+                        $("#pError").innerHTML = error.statusText;
+                    });
+                }
+            }
+
+            function AllCompanies() {
+                var request = $.getJSON("/company/allcompanies");
+
+                request.done(function (comps) {
+                    var combo = $("#CompanyId");
+                    combo.html("<option value=\"0\">Existing company</option>");
+
+                    for (var i = 0; i < comps.length; i++) {
+                        var opcija = "<option value=\"" + comps[i].CompanyId + "\">" + comps[i].CompanyName + "</option>";
+                        combo.append(opcija);
+                    }
+
+                    $("#pError").innerHTML = "";
+                });
+
+                request.fail(function (error) {
+                    $("#pError").html(error.statusText);
+                });
+            }
+
+            function TimeCheck() {
+                var request = $.getJSON("/account/timecheck/?since=" + $("#Since").val() + "&until=" + $("#Until").val());
+
+                request.done(function (result) {
+                    if (result == "1") {
+                        var choice = confirm("The time you selected overlaps with your previous working experience. Do you still want to add it?");
+                        if (choice == true) {
+                            $("#form1").submit();
+                        }
+                    }
+                    else {
+                        $("#form1").submit();
+                    }
+                });
+
+                request.fail(function (greska) {
+                    alert("Greska");
+                });
+            }
+
+            function Quit(id) {
+                if (confirm("Do you really want to quit the job?") == true) {
+                    $.post("/user/quit?id=" + id);
+                }
+            }
+
+            function EditHistory(UserId, CompanyId) {
+                window.location.href = "/account/edithistory/?UserId=" + UserId + "&CompanyId=" + CompanyId;
+            }
+        </script>
+    }

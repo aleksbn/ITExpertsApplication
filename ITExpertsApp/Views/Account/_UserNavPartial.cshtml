@@ -1,0 +1,13 @@
+﻿@model ITExpertsApp.Models.ViewModels.UserNavPartialVM
+
+@if (Request.IsAuthenticated)
+{
+    if (User.IsInRole("User"))
+    {
+        <a href="/Account/MyProfile">(@Model.Email)</a>
+    }
+    if (User.IsInRole("Company"))
+    {
+        <a href="/Account/MyCompanyProfile">(@Model.Email)</a>
+    }
+}

@@ -1,0 +1,123 @@
+﻿@model string
+
+@{ 
+    ViewBag.Title = "Job requests";
+}
+
+<h2>Respond to requests</h2>
+
+<div class="row">
+    <div class="col-md-10">
+        <table class="table table-striped table-bordered" id="tabela" hidden>
+
+        </table>
+    </div>
+</div>
+<p id="error">
+
+</p>
+
+@section Scripts{
+    <script src="~/Scripts/DateTimeConverter.js"></script>
+
+    <script>
+        $.ajaxSetup({
+            async: false
+        });
+
+        var obj = null;
+        var techToReturn = "";
+
+        $(function () {
+            var s = "";
+
+            var request = $.getJSON("/account/getrequests");
+
+            request.done(function (requests) {
+                $("#tabela").html("");
+                $("#error").html("");
+                s += "<tbody><tr><th>From</th><th>To</th><th>Status</th><th>Date of Request</th><th>Technologies</th><th>Accept</th><th>Decline</th></tr>";
+
+                for (var i in requests) {
+                    GetUser(requests[i].SenderId);
+                    var temp1 = obj;
+                    GetUser(requests[i].ReceiverId);
+                    var temp2 = obj;
+
+                    if (requests[i].Status == "New") {
+                        s += "<tr class=\"red\">";
+                    }
+                    else {
+                        s += "<tr>";
+                    }
+
+                    if (temp1.Email == "@TempData["Mail"]") {
+                        s += "<td>Me</td><td>" + temp2.FirstName + "</td>";
+                    }
+                    else {
+                        s += "<td>" + temp1.FirstName + "</td><td>Me</td>";
+                    }
+
+                    s += "<td>" + requests[i].Status + "</td><td>" + parseJsonDate(requests[i].DateOfRequest) + "</td><td>";
+
+                    var techArray = requests[i].Techs.split(',');
+                    for (var t in techArray) {
+                        GetTech(techArray[t]);
+                        s += techToReturn + "<br>";
+                    }
+
+                    if (temp1.Email != "@TempData["Mail"]") {
+                        s += "</td><td><a href=\"/account/respond?answer=1&sender=" + requests[i].SenderId + "&receiver=" + requests[i].ReceiverId + "\"><img height=\"40\" src=\"/Content/Images/acc.png\"/></a></td>";
+                    }
+                    else {
+                        s += "</td><td></td>";
+                    }
+                    s += "<td><a href=\"/account/respond?answer=0&sender=" + requests[i].SenderId + "&receiver=" + requests[i].ReceiverId + "\"><img height=\"40\" src=\"/Content/Images/deny.png\"/></a></td>";
+                    s += "</tr></tbody>";
+
+                    $("#tabela").append(s);
+                    s = "";
+                }
+                $("#tabela").removeAttr("hidden");
+            });
+
+            request.fail(function (error) {
+                $("#error").html(error.statusText);
+            });
+        });
+
+        function GetUser(id) {
+            var request = $.getJSON("/user/singleuserforrespond?id=" + id);
+
+            request.done(function (u) {
+                obj = u;
+            });
+
+            request.fail(function (error) {
+                
+            });
+        }
+
+        function GetTech(id) {
+            var request = $.getJSON("/admin/technology/returntech?techid=" + id);
+
+            request.done(function (t) {
+                techToReturn = t.TechName;
+                var nesto = 0;
+            });
+
+            request.fail(function (error) {
+                techToReturn = "error in tech";
+            });
+        }
+
+    </script>
+}
+
+@section Styles{
+    <style>
+        .red{
+            background-color: lightgray;
+        }
+    </style>
+    }

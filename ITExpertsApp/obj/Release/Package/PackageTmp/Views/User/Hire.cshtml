@@ -1,0 +1,66 @@
+﻿@model ITExpertsApp.Models.ViewModels.Account.UserVM
+
+@{
+    ViewBag.Title = "Hire employee";
+}
+
+<h2>Hire employee @Model.FirstName @Model.LastName</h2>
+
+<div class="row">
+    <h4>Select the required skills:</h4>
+    <form action="/user/hire" method="post">
+        <div class="form-horizontal">
+            <input type="hidden" name="id" value="@Model.UserId" id="id" />
+            <div class="form-group">
+                <label for="Path" class="control-label col-md-2">Paths</label>
+                <select id="DevPath" name="DevPath" class="form-control" onchange="LoadTechs()">
+                    <option value="0" selected>All paths</option>
+                    <option value="101">Back-end</option>
+                    <option value="102">Front-end</option>
+                    <option value="103">Dev-ops</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="TechId" class="control-label col-md-2">Technologies</label>
+                <select id="TechId" name="TechId" class="form-control" multiple>
+                    <option value="0" disabled>Select one or more</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Send request" />
+            </div>
+        </div>
+    </form>
+</div>
+<p id="pError">
+
+</p>
+
+@section Scripts{
+    <script>
+        function LoadTechs() {
+        $("#TechId").attr("size", "1");
+        $("#TechId").html("<option value=\"0\">Select one or more</option>");
+        var id = $("#DevPath").val();
+
+        if (id > 0) {
+            var request = $.getJSON("/admin/technology/alltechs/?pathid=" + $("#DevPath").val());
+
+            request.done(function (techs) {
+                var s = "";
+
+                for (var i = 0; i < techs.length; i++) {
+                    s += "<option value=" + techs[i].TechId + ">" + techs[i].TechName + "</option>";
+                }
+
+                $("#TechId").append(s);
+                $("#TechId").attr("size", "6");
+            });
+
+            request.fail(function (error) {
+                $("#pError").html(error.statusText);
+            });
+        }
+    }
+    </script>
+    }

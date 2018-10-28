@@ -1,0 +1,210 @@
+﻿@model ITExpertsApp.Models.ViewModels.Account.WorkingAtVM
+
+@{
+    ViewBag.Title = "Edit history";
+}
+<h2>Edit working history</h2>
+<br />
+<br />
+<form action="/account/edithistory" method="post" id="form1">
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            <input type="hidden" value="@Model.UserId" id="UserId" name="UserId" />
+            <input type="hidden" value="@Model.JobId" id="JobId" name="JobId" />
+            <input type="hidden" value="@Model.CompanyId" id="CompanyId" name="CompanyId" />
+            <input type="hidden" value="@Model.CompanyId" id="OldId" name="OldId" />
+            <input type="hidden" value="@Model.PathId" id="PathId" name="PathId" />
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="Company">Company</label>
+            <div class="col-md-10">
+                <select id="Company" onchange="SelectCompany()" class="form-control">
+                    <option value="0;">Select a company</option>
+
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CompanyName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CompanyName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CompanyName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Since, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="date" id="Since" name="Since" value="@Model.Since.ToString("yyyy-MM-dd")" class="form-control" />
+                @Html.ValidationMessageFor(model => model.Since, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Until, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @{
+                    string u = Model.Until?.ToString("yyyy-MM-dd");
+                }
+                <input type="date" id="Until" name="Until" value="@u" class="form-control" />
+                @Html.ValidationMessageFor(model => model.Until, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-2 control-label">
+                <label for="Paths">Development Path</label>
+            </div>
+            <div class="col-md-10">
+                <select id="Paths" name="Paths" class="form-control" onclick="SelectTechs()">
+                    <option value="0">Path</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.PathId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-2 control-label">
+                <label for="TechId">Select the technology you used (ctrl + click on everything you used)</label>
+            </div>
+            <div class="col-md-10">
+                <select id="TechId" name="TechId" class="form-control" multiple size="4">
+                    <option value="0">Technology</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.TechId, "", new { @class = "text-danger" })
+            </div>
+            <br />
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<p id="pError">@if (ViewBag.Status != null)
+{
+    @ViewBag.Status
+}</p>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(function () {
+
+            LoadTechs();
+
+            LoadCompanies();
+
+            LoadPaths();
+        });
+
+        function LoadCompanies() {
+            var request = $.getJSON("/company/allcompanies");
+
+            request.done(function (companies) {
+                var s = "";
+                for (var i = 0; i < companies.length; i++) {
+                    if ($("#CompanyId").val() == companies[i].CompanyId) {
+                        s += "<option value=\"" + companies[i].CompanyId + ";" + companies[i].CompanyName + "\" selected>" + companies[i].CompanyName + "</option>";
+                        $("#CompanyName").val(companies[i].CompanyName);
+                    }
+                    else {
+                        s += "<option value=\"" + companies[i].CompanyId + ";" + companies[i].CompanyName + "\">" + companies[i].CompanyName + "</option>";
+                    }
+                }
+                $("#Company").append(s);
+            });
+
+            request.fail(function (error) {
+                $("#pError").html(error.statusText);
+            });
+        }
+
+        function SelectCompany() {
+            if ($("#Company").val() != "0;") {
+                var niz = $("#Company").val().split(';');
+                $("#CompanyId").val(niz[0]);
+                $("#CompanyName").val(niz[1]);
+            }
+        }
+
+        function SelectTechs() {
+            if ($("#Paths").val() != "0") {
+                $("#PathId").val($("#Paths").val());
+                LoadTechs();
+            }
+        }
+
+        function LoadPaths() {
+            $("#Paths").html("");
+
+            var request = $.getJSON("/admin/technology/allpaths");
+
+            request.done(function (data) {
+                var s = "<option value=\"0\">Path</option>";
+                var value = @Model.PathId;
+
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].PathId == value) {
+                        s += "<option value=\"" + data[i].PathId + "\" selected>" + data[i].PathName + "</option>";
+                    }
+                    else {
+                        s += "<option value=\"" + data[i].PathId + "\">" + data[i].PathName + "</option>";
+                    }
+                }
+
+                $("#Paths").html(s);
+            });
+
+            request.fail(function (error) {
+                $("#pError").html(error.statusText);
+            });
+        }
+
+        function LoadTechs() {
+            
+            $("#TechId").html("");
+
+            var request = $.getJSON("/admin/technology/alltechs/?pathid=" + $("#PathId").val());
+
+            request.done(function (techs) {
+                var s = "";
+                var niz = @Html.Raw(Json.Encode(Model.TechId));
+
+                for (var i = 0; i < techs.length; i++) {
+                    var p = 0;
+                    for (var j = 0; j < niz.length; j++) {
+                        if (niz[j] == techs[i].TechId) {
+                            p = 1;
+                            s += "<option value=" + niz[j] + " selected>" + techs[i].TechName + "</option>";
+                        }
+                    }
+                    if (p == 0) {
+                        s += "<option value=" + techs[i].TechId + ">" + techs[i].TechName + "</option>";
+                    }
+                }
+
+                $("#TechId").append(s);
+            });
+
+            request.fail(function (error) {
+                $("#pError").html(error.statusText);
+            });
+        }
+    </script>
+}

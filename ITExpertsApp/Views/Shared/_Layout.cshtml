@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("About Me", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                @Html.ActionLink("About the Project", "Project", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    @if (Request.IsAuthenticated)
+                    {
+                        <li><a href="/Account/Logout">Logout</a></li>
+                    }
+                    else
+                    {
+                        if (ViewBag.Title == "Login")
+                        {
+                            <li class="active"><a href="/Account/Login">Login/Register</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="/Account/Login">Login/Register</a></li>
+                        }
+
+                    }
+
+                    @if (Request.IsAuthenticated && !User.IsInRole("Admin"))
+                    {
+                        <li>@Html.Action("_UserNavPartial", "Account", new { area = "" })</li>
+                    }
+
+                    @if (Request.IsAuthenticated && User.IsInRole("Company"))
+                    {
+                        <li><a href="/user/searchemployees">Developers</a></li>
+                    }
+
+                    @if (Request.IsAuthenticated && !User.IsInRole("Company"))
+                    {
+                        <li><a href="/company/companylist">Companies</a></li>
+                    }
+                    @if (Request.IsAuthenticated && !User.IsInRole("Mod") && !User.IsInRole("Admin"))
+                    {
+                        <li><a href="/account/requestlist">Job requests</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+
+        <footer>
+            <p>&copy; @DateTime.Now.Year - <a href="mailto:aleksandar.matic986@gmail.com">Aleksandar Matic</a></p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/jqueryval")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+
+@section Scripts{
+    <script>
+
+    </script>
+    }

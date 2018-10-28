@@ -1,0 +1,184 @@
+﻿
+@{
+    ViewBag.Title = "Path";
+}
+
+<div class="container">
+    <div class="row">
+        <h1>Here you can add, edit or delete paths.</h1>
+        <br />
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label for="Select1">Paths available</label>
+            <select id="Select1" class="form-control" onchange="ShowPath()">
+
+            </select>
+            <p id="pError"></p>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="txtName">Name of the path:</label>
+                <input id="txtName" type="text" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input id="btAdd" type="button" value="Add" class="btn btn-primary" onclick="AddPath()" />
+                <input id="btUpdate" type="button" value="Update" class="btn btn-primary" onclick="UpdatePath()" />
+                <input id="btDelete" type="button" value="Delete" class="btn btn-primary" onclick="DeletePath()" />
+            </div>
+            <p id="pStatus"></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(function () {
+            ShowAllPaths();
+        });
+
+        function ShowAllPaths() {
+            var request = $.getJSON("/Admin/Technology/AllPaths");
+
+            request.done(function (paths) {
+                var combo = $("#Select1");
+                var s = "<option value=\"0\">Select path</option>";
+                $("#pError").html("");
+
+                for (var i = 0; i < paths.length; i++) {
+                    s += "<option value=" + paths[i].PathId + ">" + paths[i].PathName + "</option>";
+                }
+                combo.html(s);
+            });
+
+            request.fail(function (error) {
+                $("#pError").html(error.statusText);
+            });
+        }
+
+        function AddPath() {
+            var id = $("#Select1").val();
+            var name = $("#txtName").val();
+
+            var path = {
+                PathId: id,
+                PathName: name
+            };
+
+            $("#pStatus").html("");
+            $("#btAdd").attr("disable", "true");
+            $("#btUpdate").attr("disable", "true");
+            $("#btDelete").attr("disable", "true");
+
+            var request = $.ajax({
+                type: "POST",
+                url: "/Admin/Technology/AddPath",
+                data: JSON.stringify(path),
+                contentType: "application/json",
+                dataType: "Text"
+            });
+
+            request.done(function (result) {
+                if (result == 0) {
+                    $("#pStatus").html("Error in operation!");
+                }
+                else {
+                    $("#pStatus").html("The path has been added.");
+                    ShowAllPaths();
+                    $("#txtName").val("");
+                }
+            });
+
+            request.fail(function (err) {
+                $("#pStatus").html(err.statusText);
+            });
+
+            $("#btAdd").attr("disable", "false");
+            $("#btUpdate").attr("disable", "false");
+            $("#btDelete").attr("disable", "false");
+        }
+
+        function UpdatePath() {
+            var id = $("#Select1").val();
+            var name = $("#txtName").val();
+
+            var path = {
+                PathId: id,
+                PathName: name
+            };
+
+            $("#pStatus").html("");
+            $("#btAdd").attr("disable", "true");
+            $("#btUpdate").attr("disable", "true");
+            $("#btDelete").attr("disable", "true");
+
+            var request = $.ajax({
+                type: "POST",
+                url: "/Admin/Technology/UpdatePath",
+                data: JSON.stringify(path),
+                contentType: "application/json",
+                dataType: "Text"
+            });
+
+            request.done(function (result) {
+                if (result == 0) {
+                    $("#pStatus").html("Error in operation!");
+                }
+                else {
+                    $("#pStatus").html("The path has been updated.");
+                    ShowAllPaths();
+                }
+            });
+
+            request.fail(function (err) {
+                $("#pStatus").html(err.statusText);
+            });
+
+            $("#btAdd").attr("disable", "false");
+            $("#btUpdate").attr("disable", "false");
+            $("#btDelete").attr("disable", "false");
+        }
+
+        function DeletePath() {
+            var id = $("#Select1").val();
+
+            $("#pStatus").html("");
+            $("#btAdd").attr("disable", "true");
+            $("#btUpdate").attr("disable", "true");
+            $("#btDelete").attr("disable", "true");
+
+            var request = $.ajax({
+                type: "GET",
+                url: "/Admin/Technology/DeletePath/" + id
+            });
+
+            request.done(function (result) {
+                if (result == 0) {
+                    $("#pStatus").html("Error in operation!");
+                }
+                else {
+                    $("#pStatus").html("The path has been deleted.");
+                    ShowAllPaths();
+                    $("#txtName").val("");
+                }
+            });
+
+            request.fail(function (err) {
+                $("#pStatus").html(err.statusText);
+            });
+
+            $("#btAdd").attr("disable", "false");
+            $("#btUpdate").attr("disable", "false");
+            $("#btDelete").attr("disable", "false");
+        }
+
+        function ShowPath() {
+            if ($("#Select1").val() != 0) {
+                $("#txtName").val($("#Select1 option:selected").text());
+            }
+            else {
+                $("#txtName").val("");
+            }
+        }
+    </script>
+    }

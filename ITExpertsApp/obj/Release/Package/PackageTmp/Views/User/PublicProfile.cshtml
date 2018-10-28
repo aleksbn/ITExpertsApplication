@@ -1,0 +1,208 @@
+﻿@model ITExpertsApp.Models.ViewModels.Account.UserVM
+
+@{
+    ViewBag.Title = Model.FirstName + " " + Model.LastName;
+}
+
+@{
+    int index = 0;
+    int[] months = null;
+
+    if (Model.Jobs != null)
+    {
+        months = new int[Model.Jobs.Count()];
+        for (int i = 0; i < Model.Jobs.Count(); i++)
+        {
+            if (Model.Jobs[i].Until.HasValue)
+            {
+                months[i] = (Model.Jobs[i].Until.Value.Year - Model.Jobs[i].Since.Year) * 12 + Model.Jobs[i].Until.Value.Month - Model.Jobs[i].Since.Month;
+            }
+            else
+            {
+                months[i] = (DateTime.Now.Year - Model.Jobs[i].Since.Year) * 12 + DateTime.Now.Month - Model.Jobs[i].Since.Month;
+            }
+        }
+    }
+}
+
+<div>
+    <h3>@Model.Title</h3>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LinkedIn)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LinkedIn)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StackOverflow)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StackOverflow)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DateOfBirth)
+        </dt>
+
+        <dd>
+            @string.Format("{0:dd.MM.yyyy}", Model.DateOfBirth)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EducationLevel)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EducationLevel)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.AverageGrade)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.AverageGrade)
+        </dd>
+
+        <dt id="dtHire" hidden>
+            Hire employee
+        </dt>
+
+        <dd id="ddHire" hidden>
+            @{
+                string link = "/user/hire?id=" + Model.UserId.ToString();
+            }
+            <a href="@link">Hire</a>
+        </dd>
+
+    </dl>
+    <p id="pError">
+
+    </p>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <h3>Working experience</h3>
+        @if (Model.Jobs != null)
+        {
+            <table class="table-bordered table table-striped">
+                <tr>
+                    <th>Company name</th>
+                    <th>Time spent</th>
+                    <th>Technology worked</th>
+                </tr>
+                <tr>
+                    <td>@Model.Jobs[0].CompanyName</td>
+                    <td><b>@(months[0] / 12) years and @(months[0] % 12) months</b></td>
+                    <td><button onclick="DisplayJob(@index)" class="btn btn-primary">Details</button></td>
+                </tr>
+                @for (int i = 1; i < Model.Jobs.Count(); i++)
+                {
+                    var row = Model.Jobs[i];
+                    if (Model.Jobs[i - 1].CompanyName != row.CompanyName)
+                    {
+                        <tr>
+                            <td>@row.CompanyName</td>
+                            <td><b>@(months[i] / 12) years and @(months[i] % 12) months</b></td>
+                            <td>
+                                @{
+                                    index++;
+                                }
+                                <button onclick="DisplayJob(@index)" class="btn btn-primary">Details</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </table>
+        }
+        else
+        {
+            <h4>Currently no working experience</h4>
+        }
+    </div>
+    <div class="col-md-4">
+        <div id="divExp">
+
+        </div>
+    </div>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>
+
+@section Scripts{
+    <script>
+
+    function DisplayJob(index) {
+        $("#divExp").html("");
+        var tekst = "<ol>Technologies";
+        var allTechs = JSON.parse('@Html.Raw(Json.Encode(Model.Jobs))');
+        for (var j = 0; j < allTechs[index].Technology.length; j++) {
+            var line = "<li>" + allTechs[index].Technology[j] + "</li>";
+            tekst += line;
+        }
+        tekst += "</ol>";
+        $("#divExp").append(tekst);
+    }
+
+    $(function () {
+        var request = $.getJSON("/company/checkifemployed?userid=" + @Model.UserId);
+
+        request.done(function (result) {
+            if (result == 0) {
+                $("#dtHire").removeAttr("hidden");
+                $("#ddHire").removeAttr("hidden");
+            }
+        });
+
+        request.fail(function (error) {
+            $("#pError").html(error.statusText);
+        });
+    });
+    </script>
+}

@@ -1,0 +1,12 @@
+﻿@model string
+
+@{
+    ViewBag.Title = "Welcome";
+}
+
+<h1 style="text-align: center; font-size: 4em;">Welcome!</h1>
+<p style="text-align: center; font-size: 1.5em;" class="text-danger">
+    You created your account. <br />Check your email for a
+    confirmation link. If it's not in your inbox, check the trash or spam folders. <br />If it's not there as well, use
+    the <a href="/account/resend?mail=@Model">resend</a> link to send the mail again.
+</p>

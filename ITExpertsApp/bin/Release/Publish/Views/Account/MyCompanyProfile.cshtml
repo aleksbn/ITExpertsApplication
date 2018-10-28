@@ -1,0 +1,203 @@
+﻿@model ITExpertsApp.Models.ViewModels.Account.EditCompanyVM
+
+@{
+    ViewBag.Title = "My Company Profile";
+}
+
+<br />
+@if (TempData["Status"] != null)
+{
+    <div class="row">
+        <div class="col-md-8">
+            <p id="pError" class="label label-danger text-center">
+                @TempData["Status"]
+            </p>
+        </div>
+    </div>
+}
+
+@if (TempData["Edit"] == null)
+{
+    TempData["Edit"] = 0;
+}
+
+<h2 class="text-center text-warning">My profile</h2>
+<br />
+
+<input id="btnUnlock" type="button" class="btn btn-primary" value="Unlock editing mode" onclick="UnlockClick()" />
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.CompanyId)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CompanyName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.CompanyName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.CompanyName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.OldPassword, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.OldPassword, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.OldPassword, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ConfirmPassword, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ConfirmPassword, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Budget, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Budget, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Budget, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div>
+            <div class="col-md-2">
+
+            </div>
+            <div class="col-md-10">
+                <a id="allemployees" class="alert-link text-primary" href="/company/allemployees">My employees</a>
+            </div>
+            <br />
+        </div>
+
+        <div>
+            <div class="col-md-2">
+                
+            </div>
+            <div class="col-md-10">
+                <input type="button" onclick="Deactivate()" value="Deactivate" id="deactivate" class="btn btn-primary" />
+                <span> </span>
+                <input type="button" onclick="Delete()" value="Delete" id="delete" class="btn btn-primary" />
+            </div>
+        </div>
+
+        <div class="row">
+            <br />
+            <p>
+
+            </p>
+            <br />
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save changes" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+
+        var x = @TempData["Edit"];
+
+        function Locking(x) {
+            if (x == 0) {
+                $("#CompanyName").attr("readonly", x);
+                $("#Description").attr("readonly", x);
+                $("#Budget").attr("readonly", x);
+                $("#Email").attr("readonly", x);
+                $("#Password").attr("readonly", x);
+                $("#OldPassword").attr("readonly", x);
+                $("#ConfirmPassword").attr("readonly", x);
+                $("#btnUnlock").val("Unlock editing mode");
+            }
+            else {
+                $("#CompanyName").removeAttr("readonly");
+                $("#Description").removeAttr("readonly");
+                $("#Budget").removeAttr("readonly");
+                $("#Email").removeAttr("readonly");
+                $("#Password").removeAttr("readonly");
+                $("#OldPassword").removeAttr("readonly");
+                $("#ConfirmPassword").removeAttr("readonly");
+                $("#btnUnlock").val("Lock editing mode");
+            }
+        }
+
+        $(function () {
+            Locking(x);
+        });
+
+        function UnlockClick() {
+            if (x == 0) {
+                Locking(1);
+                x = 1;
+            }
+            else {
+                Locking(0);
+                x = 0;
+            }
+        }
+
+        function Delete() {
+            var answer = confirm("Do you really want to delete your account?");
+
+            if (answer == true) {
+                window.location.href = "/account/comdelete?id=" + @Model.CompanyId;
+            }          
+        }
+
+        function Deactivate() {
+            var answer = confirm("Do you really want to deactivate your account?");
+
+            if (answer == true) {
+                window.location.href = "/account/comdeactivate?id=" + @Model.CompanyId;
+            }   
+        }
+    </script>
+}
+@section Styles{
+    <style>
+        .label {
+            font-size: large;
+        }
+
+        #allemployees {
+            font-size: 1.5em;
+        }
+    </style>
+    }

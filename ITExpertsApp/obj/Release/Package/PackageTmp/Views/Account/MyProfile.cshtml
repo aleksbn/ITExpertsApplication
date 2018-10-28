@@ -1,0 +1,284 @@
+﻿@model ITExpertsApp.Models.ViewModels.Account.EditUserVM
+
+@{
+    ViewBag.Title = "My profile";
+
+    string[] degree = new string[7];
+
+    switch (Model.EducationLevel)
+    {
+        case 1: degree[1] = "selected"; break;
+        case 2: degree[2] = "selected"; break;
+        case 3: degree[3] = "selected"; break;
+        case 4: degree[4] = "selected"; break;
+        case 5: degree[5] = "selected"; break;
+        case 6: degree[6] = "selected"; break;
+        default: degree[6] = "selected"; break;
+    }
+}
+
+<br />
+@if (TempData["Status"] != null)
+{
+<div class="row">
+    <div class="col-md-8">
+        <p id="pError" class="label label-danger text-center">
+            @TempData["Status"]
+        </p>
+    </div>
+</div>
+}
+
+@if (TempData["Edit"] == null)
+{
+    TempData["Edit"] = 0;
+}
+
+<h2 class="text-center text-warning">My profile</h2>
+<br />
+
+<input id="btnUnlock" type="button" class="btn btn-primary" value="Unlock editing mode" onclick="UnlockClick()" />
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.UserId)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.OldPassword, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.OldPassword, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.OldPassword, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ConfirmPassword, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ConfirmPassword, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LinkedIn, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.LinkedIn, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.LinkedIn, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.StackOverflow, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.StackOverflow, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.StackOverflow, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DateOfBirth, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input class="form-control text-box single-line" data-val="true" data-val-date="The field Date of Birth must be a date." data-val-required="The Date of Birth field is required." id="DateOfBirth" name="DateOfBirth" type="date" value="@String.Format("{0:yyyy-MM-dd}", Model.DateOfBirth)" />
+                @Html.ValidationMessageFor(model => model.DateOfBirth, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.EducationLevel, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select id="EducationLevel" data-val="true" class="form-control" data-val-required="You must enter your degree level!" name="EducationLevel">
+                    <option @degree[0] value="0">Select your degree level:</option>
+                    <option @degree[1] value="1">Elementary School</option>
+                    <option @degree[2] value="2">High School</option>
+                    <option @degree[3] value="3">Bachelor</option>
+                    <option @degree[4] value="4">College</option>
+                    <option @degree[5] value="5">Master</option>
+                    <option @degree[6] value="6">PHD</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.EducationLevel, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AverageGrade, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.AverageGrade, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.AverageGrade, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div>
+            <div class="col-md-2">
+
+            </div>
+            <div class="col-md-10">
+                <a id="allexperience" class="alert-link text-primary" href="/account/allexperience">My jobs</a>
+            </div>
+            <br />
+        </div>
+
+        <div>
+            <div class="col-md-2">
+                
+            </div>
+            <div class="col-md-10">
+                <input type="button" onclick="Deactivate()" value="Deactivate" id="deactivate" class="btn btn-primary" />
+                <span> </span>
+                <input type="button" onclick="Delete()" value="Delete" id="delete" class="btn btn-primary" />
+            </div>
+        </div>
+
+        <div class="row">
+            <br />
+            <p>
+
+            </p>
+            <br />
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save changes" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        var x = @TempData["Edit"];
+
+        function Locking(x) {
+            if (x == 0) {
+                $("#FirstName").attr("readonly", x);
+                $("#LastName").attr("readonly", x);
+                $("#AverageGrade").attr("readonly", x);
+                $("#DateOfBirth").attr("readonly", x);
+                $("#Description").attr("readonly", x);
+                $("#EducationLevel").attr("readonly", x);
+                $("#LinkedIn").attr("readonly", x);
+                $("#StackOverflow").attr("readonly", x);
+                $("#Title").attr("readonly", x);
+                $("#Email").attr("readonly", x);
+                $("#Password").attr("readonly", x);
+                $("#OldPassword").attr("readonly", x);
+                $("#ConfirmPassword").attr("readonly", x);
+                $("#btnUnlock").val("Unlock editing mode");
+            }
+            else {
+                $("#FirstName").removeAttr("readonly");
+                $("#LastName").removeAttr("readonly");
+                $("#AverageGrade").removeAttr("readonly");
+                $("#DateOfBirth").removeAttr("readonly");
+                $("#Description").removeAttr("readonly");
+                $("#EducationLevel").removeAttr("readonly");
+                $("#LinkedIn").removeAttr("readonly");
+                $("#StackOverflow").removeAttr("readonly");
+                $("#Title").removeAttr("readonly");
+                $("#Email").removeAttr("readonly");
+                $("#Password").removeAttr("readonly");
+                $("#OldPassword").removeAttr("readonly");
+                $("#ConfirmPassword").removeAttr("readonly");
+                $("#btnUnlock").val("Lock editing mode");
+            }
+        }
+
+        $(function () {
+            Locking(x);
+        });
+
+        function UnlockClick() {
+            if (x == 0) {
+                Locking(1);
+                x = 1;
+            }
+            else {
+                Locking(0);
+                x = 0;
+            }
+        }
+
+        function Delete() {
+            var answer = confirm("Do you really want to delete your account?");
+
+            if (answer == true) {
+                window.location.href = "/account/delete?id=" + @Model.UserId;
+            }          
+        }
+
+        function Deactivate() {
+            var answer = confirm("Do you really want to deactivate your account?");
+
+            if (answer == true) {
+                window.location.href = "/account/deactivate?id=" + @Model.UserId;
+            }   
+        }
+    </script>
+}
+
+@section Styles{
+<style>
+    .label{
+        font-size: large;
+    }
+
+    #allexperience{
+        font-size: 1.5em;
+    }
+    </style>
+    }
