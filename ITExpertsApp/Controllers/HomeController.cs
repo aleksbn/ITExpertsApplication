@@ -10,7 +10,7 @@ namespace ITExpertsApp.Controllers
     {
         public ActionResult Index()
         {
-            ViewBag.Title = "About the project";
+            ViewBag.Title = "About the creator";
 
             return View();
         }
