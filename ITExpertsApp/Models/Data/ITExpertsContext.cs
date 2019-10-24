@@ -8,7 +8,7 @@ namespace ITExpertsApp.Models.Data
     public partial class ITExpertsContext : DbContext
     {
         public ITExpertsContext()
-            : base("name=ITExpertsContext")
+            : base("name=DefaultConnection")
         {
         }
 
@@ -23,14 +23,14 @@ namespace ITExpertsApp.Models.Data
         public virtual DbSet<UserSkill> UserSkills { get; set; }
         public virtual DbSet<JobRequest> JobRequests { get; set; }
 
-        public System.Data.Entity.DbSet<ITExpertsApp.Models.ViewModels.Account.EditUserVM> EditUserVMs { get; set; }
+        //public System.Data.Entity.DbSet<ITExpertsApp.Models.ViewModels.Account.EditUserVM> EditUserVMs { get; set; }
 
-        public System.Data.Entity.DbSet<ITExpertsApp.Models.ViewModels.Account.UserVM> UserVMs { get; set; }
+        //public System.Data.Entity.DbSet<ITExpertsApp.Models.ViewModels.Account.UserVM> UserVMs { get; set; }
 
-        public System.Data.Entity.DbSet<ITExpertsApp.Models.ViewModels.CompanyVM> CompanyVMs { get; set; }
+        //public System.Data.Entity.DbSet<ITExpertsApp.Models.ViewModels.CompanyVM> CompanyVMs { get; set; }
 
-        public System.Data.Entity.DbSet<ITExpertsApp.Models.ViewModels.Account.EditCompanyVM> EditCompanyVMs { get; set; }
+        //public System.Data.Entity.DbSet<ITExpertsApp.Models.ViewModels.Account.EditCompanyVM> EditCompanyVMs { get; set; }
 
-        public System.Data.Entity.DbSet<ITExpertsApp.Models.ViewModels.Account.JobRequestVM> JobRequestVMs { get; set; }
+        //public System.Data.Entity.DbSet<ITExpertsApp.Models.ViewModels.Account.JobRequestVM> JobRequestVMs { get; set; }
     }
 }

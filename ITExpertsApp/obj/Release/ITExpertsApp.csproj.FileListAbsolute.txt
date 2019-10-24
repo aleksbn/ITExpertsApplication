@@ -233,3 +233,11 @@ C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\b
 C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\bin\System.Memory.xml
 C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\bin\System.Numerics.Vectors.xml
 C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\bin\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\bin\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\bin\MiniProfiler.dll
+C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\bin\MiniProfiler.Shared.dll
+C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\bin\System.Diagnostics.DiagnosticSource.dll
+C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\bin\Microsoft.Extensions.DependencyInjection.Abstractions.xml
+C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\bin\MiniProfiler.xml
+C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\bin\MiniProfiler.Shared.xml
+C:\Users\aleks\Documents\Visual Studio 2017\Projects\ITExpertsApp\ITExpertsApp\bin\System.Diagnostics.DiagnosticSource.xml

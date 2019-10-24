@@ -5,6 +5,7 @@ using ITExpertsApp.Models.ViewModels.Account;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -161,7 +162,7 @@ namespace ITExpertsApp.Controllers
 
             using (ITExpertsContext db = new ITExpertsContext())
             {
-                List<User> userList = db.Users.ToList();
+                List<User> userList = db.Users.AsNoTracking().ToList();
                 
                 foreach (var usr in userList)
                 {
@@ -520,7 +521,7 @@ namespace ITExpertsApp.Controllers
             {
                 user = db.Users.FirstOrDefault(x => x.Email.Equals(email));
 
-                listForConvert = db.WorkingAts.Where(x => x.UserId == user.UserId).ToList();
+                listForConvert = db.WorkingAts.AsNoTracking().Where(x => x.UserId == user.UserId).ToList();
                 convertedList = new List<WorkingAtVM>();
                 foreach (WorkingAt job in listForConvert)
                 {
@@ -972,7 +973,7 @@ namespace ITExpertsApp.Controllers
                         case 6: coefficient = 50; break;
                         default: coefficient = 0; break;
                     }
-                    List<WorkingAt> jobs = db.WorkingAts.Where(x => x.UserId == id).ToList();
+                    List<WorkingAt> jobs = db.WorkingAts.AsNoTracking().Where(x => x.UserId == id).ToList();
                     int[] technologies = jobs.Select(x => x.TechId).Distinct().ToArray();
                     int numberOfTechs = technologies.Count();
                     for (int i = 0; i < numberOfTechs; i++)
